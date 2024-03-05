@@ -14,18 +14,17 @@
             선택작,선택자
 */
 @font-face {
-    font-family: 'Ownglyph_meetme-Rg';
-    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2402_1@1.0/Ownglyph_meetme-Rg.woff2') format('woff2');
+    font-family: 'S-CoreDream-3Light';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-3Light.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 }
-
 *{
     /*기본 여백 제거 */
     padding: 0; 
     margin: 0;
     list-style-type: none; /* 글머리 */
-    font-family: 'Ownglyph_meetme-Rg';
+    font-family: 'S-CoreDream-3Light';
 }
 /* 헤더 로고 이미지 */
 #head_logo > img{
