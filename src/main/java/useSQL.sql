@@ -62,6 +62,28 @@ create table board(
     constraint board_mno_fk foreign key( mno) references member( no ) on update cascade on delete cascade ,
     constraint board_bcno_fk foreign key( bcno ) references bcategory( bcno ) on update cascade on delete cascade
 );
+
+
+
+
+
+# 3. 게시물 댓글
+drop table if exists breply;
+create table breply(
+    brno bigint unsigned auto_increment , 
+	brcontent varchar(255) not null,
+	brdate datetime default now() not null,
+	brindex bigint unsigned default 0 not null,
+	mno bigint ,
+	bno bigint unsigned,
+	constraint breply_brno_fk primary key( brno ) , 
+	constraint breply_mno_fk foreign key(mno) references member( no ) on update cascade on delete cascade , 
+	constraint breply_bno_fk foreign key(bno) references board( bno ) on update cascade on delete cascade 
+);
+select * from breply;
+
+
+# ============= 03/05 페이징 처리 ===============
 # 1. 게시물 전체출력
 select * from board;
 
@@ -88,25 +110,44 @@ select * from board b inner join member m on b.mno=m.no order by b.bdate desc li
 select * from board b inner join member m on b.mno=m.no order by b.bdate desc limit 5, 5;
 # select * from board b inner join member m on b.mno=m.no order by b.bdate desc limit ?, ?;
 
+# 총(전체) 페이지 수 : 전체게시물수 / 페이지당 게시물수
+select count(*) from board b inner join member m on b.mno=m.no;
+# 2. page Boardsize=5
+# = 10/5 -> totalPage => 2, 13/5 -> totalPage => 2(몫) + 1(나머지 게시물을 출력하기 위한 1페이지 추가)
 
 
 
-# 3. 게시물 댓글
-drop table if exists breply;
-create table breply(
-    brno bigint unsigned auto_increment , 
-	brcontent varchar(255) not null,
-	brdate datetime default now() not null,
-	brindex bigint unsigned default 0 not null,
-	mno bigint ,
-	bno bigint unsigned,
-	constraint breply_brno_fk primary key( brno ) , 
-	constraint breply_mno_fk foreign key(mno) references member( no ) on update cascade on delete cascade , 
-	constraint breply_bno_fk foreign key(bno) references board( bno ) on update cascade on delete cascade 
-);
-select * from breply;
+#============ 03/06 카테고리 별 게시물 출력 ==============#
+# 총 게시물 수 : select count(*) from board;
+# 제한된 개수만큼 게시물 출력 : select * from board b inner join member m on b.mno=m.no order by b.bdate desc limit ?, ?;
 
+# 1. [조건추가] 카테고리 만큼의 레코드수 
+select count(*) from board where bcno=1;	# 1. bcno=1(자유) 만 레코드 수
+select count(*) from board where bcno=2;	# 2. bcno=2(노하우) 만 레코드 수
+select count(*) from board where bcno=0;	# 0 없음, 전체출력
 
+# 2. [조건추가] 카테고리 조건이 포함된 제한된 개수만큼 게시물 출력
+	# 1. 자유 카테고리의 1페이지
+select * from board b inner join member m on b.mno = m.no where bcno = 1 order by b.bdate desc limit 0, 5;
+	# 2. 노하우 카테고리의 1페이지
+select * from board b inner join member m on b.mno = m.no where bcno = 2 order by b.bdate desc limit 0, 5;
+	# 3. 전체
+select * from board b inner join member m on b.mno = m.no order by b.date desc limit 0, 5;
+
+# 3. [검색 조건추가]
+select count(*) from board where bcno=1 and btitle like '%하%';	#제목에 'java'가 포함되어있는 게시물 출력
+select count(*) from board where bcno=1 and bcontent like '%하%';	#내용에 'java'가 포하되어있는 게시물 출력
+select count(*) 
+	from board b inner join member m
+	on b.mno=m.no
+    where b.bcno=1 and m.id='qweqwe';	# 작성자 아이디로 검색 시 회원테이블과 조인이 필요하다.
+
+/*
+	select count(*) 
+	from board b inner join member m
+	on b.mno=m.no
+    where b.bcno=1 and (java)key like '%하%';
+*/
 
 
 

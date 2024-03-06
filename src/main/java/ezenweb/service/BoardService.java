@@ -42,26 +42,26 @@ public class BoardService {
     }//m end
 
     //2. 전체 글 출력 호출
-    public BoardPageDto doGetBoardViewList(int page){
+    public BoardPageDto doGetBoardViewList(int page, int pageBoardSize, int bcno, String field, String value){
         System.out.println("BoardService.doGetBoardViewList");
         //페이지 처리 시 사용할 sql 구문 : limit 시작레코드번호(0부터), 개수
 
         //1. 페이지당 게시물을 출력할 개수               [출력 개수]
-        int pageBoardSize=1;
+        //int pageBoardSize=1;
 
         //2. 페이지당 게시물을 출력할 시작 레코드 번호    [시작레코드번호(0부터)]
         int startRow=(page-1)*pageBoardSize;
 
         //3. 총 페이지수
             //1. 전체 게시물 수
-        int totalBoardSize=boardDao.getBoardSize();
+        int totalBoardSize=boardDao.getBoardSize(bcno, field, value);
             //2. 총 페이지 수 계산 (나머지 값이 존재하면 +1)
         int totalPage=totalBoardSize % pageBoardSize ==0 ?
                         totalBoardSize / pageBoardSize :
                         totalBoardSize/pageBoardSize + 1;
 
         //4. 게시물 정보 요청
-        List<BoardDto> list=boardDao.doGetBoardViewList(startRow, pageBoardSize);
+        List<BoardDto> list=boardDao.doGetBoardViewList(startRow, pageBoardSize, bcno, field, value);
 
         //5. 페이징 버튼 개수
             //1. 페이지 버튼 최대 개수
@@ -75,8 +75,21 @@ public class BoardService {
             //만약에 페이지버튼의 끝번호가 총 페이지수 보다는 커질 수 없으므로
         if(endBtn >= totalPage) endBtn=totalPage;
 
-        //pageDto 구성
-        BoardPageDto boardPageDto = new BoardPageDto(page, totalPage, startBtn, endBtn, list);
+        //pageDto 구성 * 빌더패턴 : 생성자의 단점 (매개변수에 따른 유연성부족) 을 보완
+            //new 연산자 없이 builder() 함수 이용한 객체 생성 라이브러리 제공
+            //사용방법 : 클래스명.builder().필드명(대입값).필드명(대입값)/build();
+            //+ 생성자보단 유연성 : 매개변수의 순서와 개수 자유롭다.
+                //빌더패턴 vs 생성자 vs setter
+        BoardPageDto boardPageDto=BoardPageDto.builder()
+                .page(page)
+                .totalPage(totalPage)
+                .list(list)
+                .startBtn(startBtn)
+                .endBtn(endBtn)
+                .totalBoardSize(totalBoardSize)
+                .build();
+        //============== vs ================
+        //BoardPageDto boardPageDto = new BoardPageDto(page, totalPage, startBtn, endBtn, list);
 
         return boardPageDto;
     }
@@ -84,6 +97,10 @@ public class BoardService {
     //3. 개별 글 출력 호출
     public BoardDto doGetBoardView(int bno){ //bno(변수명) 같으면 @RequestParam 생략 가능
         System.out.println("Boardcontroller.doGetBoardView");
+
+        //조회수 처리 // 조회수 많으면 수익 : 조회수 처리 했다 / 안했다 증거 남겨서 하루에 한번 또는 회원마다 한번(log, 세션)
+        boardDao.boardViewIncrease(bno);
+
         return boardDao.doGetBoardView(bno);
     }//m end
 

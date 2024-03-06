@@ -22,6 +22,11 @@ function onView(){
             console.log(r);
             document.querySelector('.btitle').innerHTML=r.btitle;
             document.querySelector('.bcontent').innerHTML=r.bcontent;
+            document.querySelector('.bcno').innerHTML = r.bcno;
+            document.querySelector('.mno').innerHTML = r.mno;
+            document.querySelector('.bdate').innerHTML = r.bdate;
+            document.querySelector('.bview').innerHTML = r.bview;
+            document.querySelector('.bfile').innerHTML = r.bfile;
         }
     })//ajax end
 }//f end

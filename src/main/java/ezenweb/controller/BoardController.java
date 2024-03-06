@@ -48,10 +48,14 @@ public class BoardController {
     //2. 전체 글 출력 호출         /board/do                  Get                  x, 페이징처리, 검색
     @GetMapping("/do")  //(쿼리스트링)매개변수 : 현재페이지
     @ResponseBody
-    public BoardPageDto doGetBoardViewList(int page){
+    public BoardPageDto doGetBoardViewList(@RequestParam int  page, 
+                                           @RequestParam int pageBoardSize, 
+                                           @RequestParam int bcno,
+                                           @RequestParam("key") String field,
+                                           @RequestParam("keyword") String value){
         System.out.println("BoardController.doGetBoardViewList");
         System.out.println("page = " + page);
-        return boardService.doGetBoardViewList(page);
+        return boardService.doGetBoardViewList(page, pageBoardSize, bcno, field, value);
     }
 
     //3. 개별 글 출력 호출         /board/view.do             Get                  게시물번호
