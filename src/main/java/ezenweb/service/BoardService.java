@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
@@ -105,7 +106,31 @@ public class BoardService {
     }//m end
 
     //4. 글 수정 처리
+    public boolean doUpdateBoard(BoardDto boardDto){
+        System.out.println("BoardService.doUpdateBoard");
+        System.out.println("boardDto = " + boardDto);
+
+        return boardDao.doUpdateBoard(boardDto);
+    }//m end
 
     //5. 글 삭제 처리
+    public boolean doDeleteBoard(int bno){
+        System.out.println("BoardService.doDeleteBoard");
+        //게시판 정보 호출 : 레코드 삭제하기 전에 삭제할 첨부파일명을 임시로 꺼내둔다.
+        String bfile =boardDao.doGetBoardView(bno).getBfile();
+        
+        //1. dao 처리
+        boolean result=boardDao.doDeleteBoard(bno);
+        
+        //2. dao처리 성공 시 첨부파일도 삭제
+        if(result){
+            //기존에 첨부파일이 있었으면
+            System.out.println("bfile = " + bfile);
+            if(bfile!=null){
+                fileService.fileDelete(bfile);  //미리 꺼내둔 삭제할 파일명 대입한다.
+            }//if end
+        }//if end
+        return result;
+    }//m end
 
 }//c end

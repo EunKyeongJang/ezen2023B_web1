@@ -1,15 +1,27 @@
 package ezenweb.service;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.net.URLEncoder;
 import java.util.UUID;
 
 @Service // 해당 클래스를 스프링 컨터이너(저장소)에 빈(객체) 등록
 public class FileService {
     // Controller : 중계자 역할 ( HTTP매핑 , HTTP요청/응답 , 데이터 유효성검사 )등등
     // Service : Controller <--  Service(비지니로직) --> Dao ,  Controller <--> Service(비지니로직)
+    
+    @Autowired
+    private HttpServletRequest request; //HTTP로 요청을 보낸 정보가 담긱 객체 (매개변수와 브라우저 정보 -> 세션)
+    @Autowired
+    private HttpServletResponse response;   //HTTP로 응답을 보낼 정보와 기능/메소드 가지고 있는 객체
 
     // 어디에(PATH) 누구를(파일객체 MultipartFile )
     String uploadPath = "C:\\Users\\504\\Desktop\\ezen2023B_web1-master\\build\\resources\\main\\static\\img\\";
@@ -32,7 +44,82 @@ public class FileService {
         return filename; // 반환 : 어떤 이름으로 업로드 했는지 식별명 반환해서
     }
     // 2. 다운로드 메소드
-}
+    public void fileDownload(String bfile){
+        System.out.println("FileService.fileDownload");
+        System.out.println("bfile = " + bfile);
+        
+        //1. 다운로드 할 파일의 경로와 파일명 연결해서 해당파일 찾기
+        String downloadPath=uploadPath+bfile;
+        System.out.println("downloadPath = " + downloadPath);
+        
+        //2. 해당 파일을 객체로 가져오기 [File 클래스]
+        File file=new File(downloadPath);
+        System.out.println("file = " + file);
+
+        //3. exists() : 해당경로에 파일이 있다/없다 판단
+        if(file.exists()){
+            System.out.println("exists");
+
+            //HTTP가 파일을 전송하는 방법 : 파일을 바이트로 전송
+            try {   //혹시나 파일이 없을 수 있으므로 예외처리 필수
+
+                // HTTP로 응답 시 응답방법(다운로드 모양)에 대한 정보(HTTP header)를 추가
+                //url은 한글지원 안한다.
+                //url에 한글 지원 하기 위해서는 URLEncoder.encode(url정보, "utf-8")
+                //첨부파일 다운로드 형식 : 브라우저마다 형식이 다르다.(커스텀 불가능)
+                response.setHeader("Content-Disposition", "attachment;filename="
+                        + URLEncoder.encode(bfile.split("_")[1],"utf-8"));
+
+                //1. 해당파일을 바이트로 불러온다.                           [BufferedInputStream]
+                    //1-1 파일 입력스트림(바이트가 다니는 통로)객체 생성
+                BufferedInputStream fin = new BufferedInputStream(new FileInputStream(file));
+                    //1-2 바이트 배열(고정길이) vs 리스트(가변길이)
+                        //1. 파일의 사이즈/크기/용량 (파일의 크기만큼 바이트 배열 선언하기 위해)
+                long fileSize=file.length();
+                        //2. 해당 파일의 사이즈 만큼 바이트 배열 선언
+                byte[] bytes=new byte[(int)fileSize];    //배열의 길이는 int형
+                    //1-3 입력(불러오기) 메소드
+                        //바이트 하나씩 읽어오면서바이트 배열 저장 => 바이트 배열 필요하다.
+                fin.read(bytes);    //입력스트림객체.read(바이트) 하나씩 바이트를 읽어와서 해당 바이트 배열에 저장 해 주는 함구
+                
+                    //1-4(확인용) 읽어온 파일의 바이트가 들어있다
+                System.out.println("bytes = " + bytes);
+                
+                //2. 불러온 바이트를 HTTP response 이용한 바이트로 응답한다.  [BufferedOutputStream]
+                    //2-1 HTTP 응답스트림 객체 생성
+                BufferedOutputStream fout = new BufferedOutputStream(response.getOutputStream());
+                    //2-2 응답스트림.write (내보내기 할 바이트 배열) : 내보내기 할 바이트 배열 준비상태이면 내보내기
+                fout.write(bytes);
+            }//try end
+            catch (Exception e){
+                System.out.println("e = " + e);
+            }
+            
+        }//if end
+        else{
+            System.out.println("undefined");
+        }//else end
+
+        return;
+    }//m end
+
+    //3. 파일삭제 [게시물 삭제 시 첨부파일이 있으면 첨부파일도 같이 삭제, 게시물 수정 시 첨부파일 변경하면 기존 첨부파일 삭제
+    public boolean fileDelete(String bfile){
+        System.out.println("FileService.fileDelete");
+        //1. 경로와 파일을 합쳐서 파일 위치 찾기
+        String filePath=uploadPath+bfile;
+        //2. File클래스의 메소드 활용
+            //.exists() : 해당 파일의 존재 여부
+            //.length() : 해당 파일의 크기/용량(바이트 단위)
+            //.delete() : 해당 파일을 삭제
+        File file=new File(filePath);
+        if(file.exists()){//해당 경로에 파일이 존재하면 삭제
+            System.out.println("fileService if run");
+            return file.delete();  //해당 경로에 파일 삭제;
+        }
+        return false;
+    }//m end
+}//c end
 /*
 
 

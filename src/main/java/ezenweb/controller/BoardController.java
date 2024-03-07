@@ -3,6 +3,7 @@ package ezenweb.controller;
 import ezenweb.model.dto.BoardDto;
 import ezenweb.model.dto.BoardPageDto;
 import ezenweb.service.BoardService;
+import ezenweb.service.FileService;
 import ezenweb.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,8 @@ import java.util.List;
 public class BoardController {
     @Autowired
     BoardService boardService;
+    @Autowired
+    FileService fileService;
     @Autowired
     private MemberService memberService;
     @Autowired
@@ -67,9 +70,34 @@ public class BoardController {
     }//m end
 
     //4. 글 수정 처리             /board/update.do            Put                 Dto
+    @PutMapping("/update.do")
+    @ResponseBody
+    public boolean doUpdateBoard(BoardDto boardDto){
+        System.out.println("BoardController.doUpdateBoard");
+        System.out.println("boardDto = " + boardDto);
+
+        return boardService.doUpdateBoard(boardDto);
+    }
 
     //5. 글 삭제 처리             /board/delete.do            delete              게시물번호
+    @DeleteMapping("/delete.do")
+    @ResponseBody
+    public boolean doDeleteBoard(@RequestParam int bno){
+        System.out.println("BoardController.doDeleteBoard");
+        return boardService.doDeleteBoard(bno);
+    }
 
+    //6. 다운로드 처리(함수만들때 고민할점 1.매개변수:파일명 2.반환  3.사용처:get http 요청)
+    @GetMapping("/file/download")
+    @ResponseBody
+    public void getBoardFileDownload(String bfile){
+        System.out.println("BoardController.getBoardFileDownload");
+        System.out.println("bfile = " + bfile);
+
+        fileService.fileDownload(bfile);
+
+        return;
+    }
     //======================== 머스테치는 컨트롤에서 뷰 반환 ========================
 
     //1. 글쓰기 페이지 이동         /board/write               Get

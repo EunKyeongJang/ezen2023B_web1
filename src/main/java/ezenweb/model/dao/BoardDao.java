@@ -2,6 +2,7 @@ package ezenweb.model.dao;
 
 import ezenweb.model.dto.BoardDto;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -173,6 +174,52 @@ public class BoardDao extends Dao {
     }
 
     //4. 글 수정 처리
+    public boolean doUpdateBoard(BoardDto boardDto){
+        System.out.println("BoardDao.doUpdateBoard");
+        System.out.println("boardDto = " + boardDto);
+        try{
+            String sql="update board set btitle=?, bcontent=?, bcno=? where bno=?;";
+            ps=conn.prepareStatement(sql);
+            ps.setString(1, boardDto.getBtitle());
+            ps.setString(2, boardDto.getBcontent());
+            ps.setLong(3, boardDto.getBcno());
+            ps.setLong(4, boardDto.getBno());
+
+            int count=ps.executeUpdate();
+            if(count==1){
+                return true;
+            }
+        }
+        catch (Exception e){
+            System.out.println("e = " + e);
+        }
+        return false;
+    }//m end
 
     //5. 글 삭제 처리
+    public boolean doDeleteBoard(int bno){
+        System.out.println("BoardDao.doDeleteBoard");
+        try{
+            String sql="delete from board where bno=?;";
+            ps=conn.prepareStatement(sql);
+            ps.setInt(1,bno);
+            int count=ps.executeUpdate();
+
+            if(count==1){
+                return true;
+            }
+        }
+        catch (Exception e){
+            System.out.println("e = " + e);
+        }
+        return false;
+    }//m end
+
+    //6. 다운로드 처리
+    public void getBoardFileDownload(String bfile){
+        System.out.println("BoardController.getBoardFileDownload");
+        System.out.println("bfile = " + bfile);
+
+        return;
+    }//m end
 }//c end

@@ -148,6 +148,21 @@ select count(*)
 	on b.mno=m.no
     where b.bcno=1 and (java)key like '%하%';
 */
+# 조회수 증가
+update board set bview=bview+1 where bno=1;
+select * from board;
+
+#==============03/07================#
+#1.게시물 삭제 / 레코드 삭제
+delete from board;	# 모든 레코드 삭제 : DML : rollback 가능
+truncate board;	# 모든 레코드 삭제 : DDL : rollback 불가능
+#2. 특정 레코드 삭제
+delete from board where bno=1;
+
+#1. 게시물 수정
+update board set btitle='새로운값';	#모든 레코드 수정
+#2. 특정 게시물 수정
+update board set btitle='새로운값', bcontent='새로운값', bcno=3 where bno=1;
 
 
 
