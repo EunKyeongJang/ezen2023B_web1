@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class BoardService {
@@ -105,10 +106,33 @@ public class BoardService {
         return boardDao.doGetBoardView(bno);
     }//m end
 
-    //4. 글 수정 처리
+    //4. 글 수정 처리(매개변수 : bno, btitle, bcontent, Uploadfile, bcno)
     public boolean doUpdateBoard(BoardDto boardDto){
         System.out.println("BoardService.doUpdateBoard");
         System.out.println("boardDto = " + boardDto);
+
+        //*1. 기존 첨부파일 명 구하고
+        String bfile=boardDao.doGetBoardView((int)boardDto.getBno()).getBfile();
+
+        //- 새로운 첨부파일이 있다. 없다.
+        if(!boardDto.getUploadfile().isEmpty()){    //수정 시 새로운 첨부파일이 있으면
+            //새로은 첨부파일을 업로드 하고 기존 첨부파일 삭제
+            String fileName= fileService.fileUpload(boardDto.getUploadfile());
+            if (fileName != null) { //업로드 성공
+                boardDto.setBfile(fileName);    //새로운 첨부파일 이름 dto 대입
+
+                //*기존 첨부파일 삭제
+                    //*2. 기존 첨부파일 삭제
+                fileService.fileDelete(bfile);
+            }
+            else{
+                return false;   //업로드 실패
+            }
+        }//if end
+        else{
+            //새로운 첨부파일 없으면 업로드 할 필요 없음 > 기존 첨부파일명 대입
+            boardDto.setBfile(bfile);
+        }//else end
 
         return boardDao.doUpdateBoard(boardDto);
     }//m end
@@ -132,5 +156,27 @@ public class BoardService {
         }//if end
         return result;
     }//m end
+
+    //6.게시물 작성자 인증
+    public boolean boardWriterAuth(long bno, String mid){
+        return boardDao.boardWriterAuth(bno, mid);
+    }
+
+    //7. 댓글 등록
+    public boolean postReplyWrite(@RequestParam Map<String, String> map){
+        System.out.println("BoardService.getReplyWrite");
+        System.out.println("map = " + map);
+
+        return boardDao.postReplyWrite(map);
+    }
+
+    //8. 댓글 출력
+    public List<Map<String , String>> getReplyDo(int bno){
+        System.out.println("BoardService.getReplyDo");
+        System.out.println("bno = " + bno);
+
+        return boardDao.getReplyDo(bno);
+    }
+
 
 }//c end

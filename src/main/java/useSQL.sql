@@ -162,10 +162,12 @@ delete from board where bno=1;
 #1. 게시물 수정
 update board set btitle='새로운값';	#모든 레코드 수정
 #2. 특정 게시물 수정
-update board set btitle='새로운값', bcontent='새로운값', bcno=3 where bno=1;
-
-
-
+update board set btitle='첨부있음', bcontent='새로운값', bcno=3 where bno=12;
+select*from board;
+#
+select *from board b inner join member m inner join bcategory bc
+on b.mno=m.no and b.bcno=bc.bcno
+where  b.bno=18;
 
 
 

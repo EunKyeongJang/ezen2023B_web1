@@ -37,8 +37,49 @@
         multipartFile.transferTo( file );
 
 * 업로드된 파일명을 DB처리 ( 파일 자체를 DB처리 하지 않는다 )
+* 업로드 시 첨부파일의 용량 제한(10MB)
+    - application.properties 용량에 설정 가능
+        spring.servlet.multipart.max-file-size= 원하는 용량  (10GB, 50GB, -1)
+        spring.servlet.multipart.max-request-size= 원하는 용량
+            -1 : 용량 제한 없음 >> 버퍼가 많이 쌓이기 때문에 buffer를 꼭 닫아주어야함(JVM은 시간이 좀 지나서 자동으로 지우기 때문에)
 
 = 2. 다운로드 =====================================================================================================================
+스트림 : 실제의 입력이나 출력이 표현된 데이터의 이상화된 흐름 / 데이터가 다니는 통로
+버퍼: 데이터 전송하는 동안 일시적인 데이터를 보관하는 메모리 영역 / 큐 / 대용량일때 수동 초기화 권장.
 
+                                                                            서버
+클라이언트(브라우저)                                             아파치 톰캣                                              다운로드파일이 모여있는 폴더
+                                                                                                                         C:\Users\504-t\Desktop\ezen2023B_web1\build\resources\main\static\img\
+                -----------1. HTTP 요청(파일명)--------------->
+                                                                2. 해당 경로에 요청한 파일이 있는지 체크
+                                                                        file.exists()
+
+                                                                3.  해당파일을 바이트로 가져오기
+                                                                                                <-------바이트로 가져오기---------
+                                                                                                new BufferedInputStream( new FileInputStream(file) );
+                                                                                                -파일 스트림
+                                                                                                fin.read( bytes );
+                                                                                                -------------------------------
+                                                                                                 바이트1 , 바이트2 , 바이트3 , 바이트4       ppt파일.ppt
+                                                                                                --------------------------------
+                                                                bytes = [
+                                                                        바이트1,
+                                                                        바이트2,
+                                                                        바이트3,
+                                                                        바이트4,
+                                                                ]
+
+                                                                4. 해당 바이트 배열 내보내기
+
+
+                <-----------HTTP 바이트응답--------------
+                HTTP response 스트림                             new BufferedOutputStream( response.getOutputStream() );
+                                            fout.write( bytes );
+                                            -------------------------------
+                                             바이트1 , 바이트2 , 바이트3 , 바이트4
+                                            --------------------------------
+
+                                                                5. 브라우저에게 다운로드 형식에 정보 전달
+                                                                response.setHeader( "Content-Disposition" , "attachment;filename="+URLEncoder.encode( bfile.split("_")[1] , "utf-8") );
 
 

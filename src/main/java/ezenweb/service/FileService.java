@@ -90,6 +90,12 @@ public class FileService {
                 BufferedOutputStream fout = new BufferedOutputStream(response.getOutputStream());
                     //2-2 응답스트림.write (내보내기 할 바이트 배열) : 내보내기 할 바이트 배열 준비상태이면 내보내기
                 fout.write(bytes);
+
+                //======== 버퍼 초기화(안전하게) =========
+                fin.close();    //스트림 닫기
+                fout.close();   //스트림 닫기
+                    //JVM이 함수 종료 시 지워주기는 하지만 안전하게 하기 위해 메모리 초기화 작업을 추가했음
+
             }//try end
             catch (Exception e){
                 System.out.println("e = " + e);
