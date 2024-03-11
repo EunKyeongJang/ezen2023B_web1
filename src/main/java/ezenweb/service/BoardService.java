@@ -163,7 +163,7 @@ public class BoardService {
     }
 
     //7. 댓글 등록
-    public boolean postReplyWrite(@RequestParam Map<String, String> map){
+    public boolean postReplyWrite(Map<String, String> map){
         System.out.println("BoardService.getReplyWrite");
         System.out.println("map = " + map);
 
@@ -171,7 +171,7 @@ public class BoardService {
     }
 
     //8. 댓글 출력
-    public List<Map<String , String>> getReplyDo(int bno){
+    public List<Map<String , Object>> getReplyDo(int bno){
         System.out.println("BoardService.getReplyDo");
         System.out.println("bno = " + bno);
 

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -246,8 +247,8 @@ public class BoardDao extends Dao {
     }
 
     //8. 댓글 등록
-    public boolean postReplyWrite(@RequestParam Map<String, String> map){
-        System.out.println("BoardService.getReplyWrite");
+    public boolean postReplyWrite(Map<String, String> map){
+        System.out.println("BoardDao.postReplyWrite");
         System.out.println("map = " + map);
 
         try{
@@ -271,23 +272,44 @@ public class BoardDao extends Dao {
     }
 
     //9. 댓글 출력
-    public List<Map<String , String>> getReplyDo(int bno){
-        System.out.println("BoardService.getReplyDo");
+    public List<Map<String , Object>> getReplyDo(int bno){
+        System.out.println("BoardDao.getReplyDo");
         System.out.println("bno = " + bno);
         //List
-        List<Map<String, String>> list=new ArrayList<>();
+        List<Map<String, Object>> list=new ArrayList<>();
 
         try{
             //상위댓글 먼저 출력
-            String sql="select * from breply where and brindex = 0  bno= "+bno;
+            String sql="select * from breply where brindex = 0 and  bno= "+bno;
             ps=conn.prepareStatement(sql);
             rs=ps.executeQuery();
             while(rs.next()){
-                Map<String, String> map = new HashMap<>();
+                //====== 상위댓글 하나씩 객체화 하는곳 =========//
+                Map<String, Object> map = new HashMap<>();
                 map.put("brno", rs.getString("brno"));
                 map.put("brcontent", rs.getString("brcontent"));
                 map.put("brdate", rs.getString("brdate"));
                 map.put("mno", rs.getString("mno"));
+
+                //============ 해당 상위댓글의 하위댓글들도 호출 ===========//
+                String subSql2="select * from breply where brindex=? and bno="+bno;
+                ps=conn.prepareStatement(subSql2);
+                ps.setString(1, rs.getString("brno"));
+                    //(int) vs Integer.parseInt()
+                //**** rs 사용하면 안되는 이유 : 현재 상위댓글 출력 시 rs 사용중(while (rs.next())
+                ResultSet rs2=ps.executeQuery();
+
+                List<Map<String, Object>> subList=new ArrayList<>();
+                while(rs2.next()) {
+                    Map<String, Object> subMap = new HashMap<>();   //댓글 답변
+                    subMap.put("brno", rs2.getString("brno"));
+                    subMap.put("brcontent", rs2.getString("brcontent"));
+                    subMap.put("brdate", rs2.getString("brdate"));
+                    subMap.put("mno", rs2.getString("mno"));
+
+                    subList.add(subMap);
+                }
+                map.put("subReply", subList);
 
                 list.add(map);
             }//w end

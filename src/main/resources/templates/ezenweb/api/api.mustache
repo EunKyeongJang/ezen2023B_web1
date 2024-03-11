@@ -1,0 +1,42 @@
+{{>ezenweb/header}}
+<div class="container">
+    <div>
+        <h3> 카카오 지도 </h3>
+        <div id="map" style="width:1000px;height:400px;"></div>
+        <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=0de0f114f4db55352233f7e35d89167b&libraries=clusterer"></script>
+    </div>
+
+    <h3> 공공데이터 : 안산시 원곡동 일반음식점</h3>
+    <table class="table">
+        <thead>
+            <th> 사업장명 </th>
+            <th> 도로명전체주소 </th>
+            <th> 대표메뉴1 </th>
+            <th> 메뉴가격1 </th>
+            <th> 대표전화 </th>
+            <th> 주차 가능 </th>
+        </thead>
+        <tbody class="apiTable2">
+
+
+        </tbody>
+    </table>
+
+    <h3> 공공데이터 : 안산시 일별 강우량 </h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th> 관리기관명 </th>
+                <th> 날짜 </th>
+                <th> 지역 </th>
+                <th> 우량(mm) </th>
+            </tr>
+        </thead>
+        <tbody class="apiTable1">
+
+        </tbody>
+    </table>
+</div>
+
+<script src="/js/api/api.js"></script>
+{{>ezenweb/footer}}
