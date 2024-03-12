@@ -1,0 +1,21 @@
+{{>ezenweb/header}}
+<div class="constainer">
+    <h3>제품등록</h3>
+    <form class="productRegisterForm">
+        <h6>제품명</h6>
+            <input name="pname" type="text"/>
+        <h6>제품가격</h6>
+            <input name="pprice" type="text"/>
+        <h6>제품내용</h6>
+            <textarea name="pcontent" ></textarea>
+        <h6>제품이미지</h6>
+            <input name="uploadFiles" type="file" multiple/>
+        <h6>제품거래위치</h6>
+            <div id="map" style="width:50%;height:350px;"></div>
+        <button type="button" onclick="onRegister()"> 등록</button>
+
+    </form>
+</div>
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=0de0f114f4db55352233f7e35d89167b&libraries=clusterer"></script>
+<script src="/js/product/register.js"></script>
+{{>ezenweb/footer}}
