@@ -169,6 +169,8 @@ select *from board b inner join member m inner join bcategory bc
 on b.mno=m.no and b.bcno=bc.bcno
 where  b.bno=2;
 
+select * from breply;
+
 
 
 
