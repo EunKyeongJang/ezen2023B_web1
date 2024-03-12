@@ -201,7 +201,12 @@ create table productimg(
     constraint productimg_pno_fk foreign key(pno) references product(pno) on update cascade on delete cascade
 );
 
+select * from product;
+select * from productimg;
+
 insert into product(필드명) values(1),(1),(1);
+
+select * from member;
 
 
 
