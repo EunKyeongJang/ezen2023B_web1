@@ -208,6 +208,20 @@ insert into product(필드명) values(1),(1),(1);
 
 select * from member;
 
+#1. id 
+select *  from product p inner join member m on p.mno=m.no;
+#2. img
+select * from productimg where pno=2;
+
+
+#3. 좋아요 테이블
+drop table if exists plike;
+create table plike(
+	mno bigint,
+    pno int, 		-- pno와 mno가 일치했을때 삭제
+    constraint plike_mno_fk foreign key(mno) references member(no) on update cascade on delete cascade,
+    constraint plike_pno_fk foreign key(pno) references product(pno) on update cascade on delete cascade
+);
 
 
 

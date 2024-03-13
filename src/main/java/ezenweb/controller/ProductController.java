@@ -45,6 +45,54 @@ public class ProductController {
 
         return productService.getProductList();
     }//m end
+    
+    //3. 해당 제품의 찜하기 등록  //언제실행:로그인했고 찜하기 버튼 클릭시 , 매개변수:pno , 리턴:boolean(등록 성공/실패)
+    @PostMapping("/plike.do")
+    @ResponseBody
+    public boolean getPlikeWrite(int pno){
+        System.out.println("ProductController.getPlikeWrite");
+        System.out.println("pno = " + pno);
+
+        Object object=request.getSession().getAttribute("loginDto");
+        if(object==null){
+            return false;
+        }
+        int mno=memberService.doGetLoginInfo((String) object).getNo();
+
+        return productService.getPlikeWrite(pno, mno);
+    }
+    
+    //4. 해당 제품의 찜하기 상태 등록   //언제실행:로그인했고 찜하기 버튼 출력시 , 매개변수:pno , 리턴:boolean(등록 있다/없다)
+    @GetMapping("/plike.do")
+    @ResponseBody
+    public boolean getPlikeView(int pno){
+        System.out.println("ProductController.getPlikeView");
+        System.out.println("pno = " + pno);
+
+        Object object=request.getSession().getAttribute("loginDto");
+        if(object==null){
+            return false;
+        }
+        int mno=memberService.doGetLoginInfo((String) object).getNo();
+
+        return productService.getPlikeView(pno, mno);
+    }
+    
+    //5. 해당 제품의 찜하기 취소/삭제   //언제실행:로그인했고 찜하기 버튼 클릭시 , 매개변수:pno , 리턴:boolean(등록 취소 성공/실패)
+    @DeleteMapping("/plike.do")
+    @ResponseBody
+    public boolean getPlikeDelete(int pno){
+        System.out.println("ProductController.getPlikeDelete");
+        System.out.println("pno = " + pno);
+
+        Object object=request.getSession().getAttribute("loginDto");
+        if(object==null){
+            return false;
+        }
+        int mno=memberService.doGetLoginInfo((String) object).getNo();
+
+        return productService.getPlikeDelete(pno, mno);
+    }
 
     //1. 등록 페이지/화면/뷰 요청
     @GetMapping("/register")

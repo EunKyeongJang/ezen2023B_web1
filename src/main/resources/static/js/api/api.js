@@ -12,6 +12,7 @@ var map = new kakao.maps.Map(document.getElementById('map'), { // 지도를 표�
         minLevel: 10 // 클러스터 할 최소 지도 레벨
     });
 
+
     //3. !!
     // 데이터를 가져오기 위해 jQuery를 사용합니다
     // 데이터를 가져와 마커를 생성하고 클러스터러 객체에 넘겨줍니다
@@ -29,7 +30,7 @@ var map = new kakao.maps.Map(document.getElementById('map'), { // 지도를 표�
         url : "https://api.odcloud.kr/api/15109590/v1/uddi:3e550608-d205-411b-a92d-e7fd2278b7bc?page=1&perPage=100&serviceKey=UdKU55Ou1k%2FbVPGoFGuDIG9ZguL1BE6hUMf%2B%2FbyvLHhF8yuunoXj7ikFnjQwE3CbxlWHG7ODVN0NmEla59Vrcw%3D%3D",
         method : "Get",
         success : (response) => {
-            var markers = r.data.map((object) => {
+            var markers = response.data.map((object) => {
                 //마커 1개 만들어서 리턴 해서 markers에 대입
                 return new kakao.maps.Marker({
                     //마커의 위치
@@ -99,7 +100,6 @@ $.ajax({
             apiTable2.innerHTML=html;
     }//success end
 })//ajax end
-
 
 /*
     객체명.속성명===객체명['속성명']

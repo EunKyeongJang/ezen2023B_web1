@@ -4,6 +4,7 @@ import com.sun.jdi.event.ExceptionEvent;
 import ezenweb.model.dto.ProductDto;
 import org.springframework.stereotype.Component;
 
+import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,18 +63,34 @@ public class ProductDao extends Dao{
 
         List<ProductDto> list=new ArrayList<>();
         try{
-            String sql="select*from product";
+            String sql="select *  from product p inner join member m on p.mno=m.no";
             ps=conn.prepareStatement(sql);
             rs=ps.executeQuery();
             while(rs.next()){
                 //빌더패턴 : 클래스명.Builder().필드명(값).build()
-                list.add(ProductDto.builder()
+                ProductDto productDto= ProductDto.builder()
                         .pno(rs.getInt("pno"))
                         .pname(rs.getString("pname"))
                         .pprice(rs.getInt("pprice"))
                         .plat((rs.getString("plat")))
                         .plng(rs.getString("plng"))
-                        .build());
+                        .pdate(rs.getString("pdate"))
+                        .mid(rs.getString("id"))
+                        .pcontent(rs.getString("pcontent"))
+                        .build();
+                //제품 이미지
+                List<String> imgList=new ArrayList<>();
+                
+                //제품 이미지출력
+                String subSql="select * from productImg where pno="+productDto.getPno();
+                ps=conn.prepareStatement(subSql);
+                ResultSet rs2=ps.executeQuery();
+                while(rs2.next()){
+                    imgList.add(rs2.getString("pimg"));
+                }//w end
+
+                productDto.setPimg(imgList);    //제품이미지 등록
+                list.add(productDto);   //제품목록에 제품 등록
             }//while end
             return list;
         }//try end
@@ -83,4 +100,64 @@ public class ProductDao extends Dao{
         return null;
     }//m end
 
-}
+    //3. 해당 제품의 찜하기 등록  //언제실행:로그인했고 찜하기 버튼 클릭시 , 매개변수:pno , 리턴:boolean(등록 성공/실패)
+    public boolean getPlikeWrite(int pno, int mno){
+        System.out.println("ProductDao.getPlikeWrite");
+        System.out.println("pno = " + pno);
+        try{
+            String sql="insert into plike values(?,?)";
+            ps=conn.prepareStatement(sql);
+            ps.setInt(1, mno);
+            ps.setInt(2, pno);
+            int count=ps.executeUpdate();
+            if(count==1){
+                return true;
+            }
+        }
+        catch (Exception e){
+            System.out.println("e = " + e);
+        }
+        return false;
+    }//m end
+
+    //4. 해당 제품의 찜하기 상태 등록   //언제실행:로그인했고 찜하기 버튼 출력시 , 매개변수:pno , 리턴:boolean(등록 있다/없다)
+    public boolean getPlikeView(int pno, int mno){
+        System.out.println("ProductDao.getPlikeView");
+        System.out.println("pno = " + pno);
+        try{
+            String sql="select * from plike where mno=? and pno=?";
+            ps=conn.prepareStatement(sql);
+            ps.setInt(1, mno);
+            ps.setInt(2, pno);
+            rs=ps.executeQuery();
+            if(rs.next()){
+                return true;
+            }
+        }
+        catch (Exception e){
+            System.out.println("e = " + e);
+        }
+        return false;
+    }//m end
+
+    //5. 해당 제품의 찜하기 취소/삭제   //언제실행:로그인했고 찜하기 버튼 클릭시 , 매개변수:pno , 리턴:boolean(등록 취소 성공/실패)
+    public boolean getPlikeDelete(int pno, int mno){
+        System.out.println("ProductDao.getPlikeDelete");
+        System.out.println("pno = " + pno);
+        try{
+            String sql="delete from plike where mno=? and pno=?";
+            ps=conn.prepareStatement(sql);
+            ps.setInt(1, mno);
+            ps.setInt(2, pno);
+            int count=ps.executeUpdate();
+            if(count==1){
+                return true;
+            }
+        }
+        catch (Exception e){
+            System.out.println("e = " + e);
+        }
+        return false;
+    }//m end
+
+}//c end
